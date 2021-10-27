@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+input{
+    width:494px;
+    height:100px;
+    border:1px solid black;
+    margin-top:10px;
+    font-size: x-large;
+}
+#change{
+    width:500px;
+    height:300px;
+    border:1px solid black;
+    margin-top:20px;
+    font-size:xx-large;
+    font-weight: normal;
+}
+#flexx{
+    margin-left:500px;
+}
+select{
+    margin-left:500px;
+    width:250px;
+height:30px;
+font-size: medium;
+}
+#tbutton{
+    margin-left:10px;
+    width:220px;
+    height:30px;
+    font-size: medium;
+}
+
+        #sbutton {
+            
+            margin-top:2px;
+            background-color: white;
+            border: 0px;
+            cursor:pointer;
+            border-radius: 5px;
+        }
+      
+     img{
+        
+         width:30px;
+         height: 25px;
+     }
+     img:hover{
+         box-shadow: 1px 1px 1px 1px gray;
+     }
+
+
+
+</style>
+<body>
+
+   
+    <select id="lan">
+        
+        <option value="en">English</option>
+        <option value="hi">Hindi</option>
+        <option value='ar'>Arabic</option>
+        <option value='zh'>Chinese</option>
+        <option value='fr'>French</option>
+        <option value='de'>German</option>
+        <option value='id'>Idonesian</option>
+        <option value='ga'>Irish</option>
+        <option value='it'>Italian</option>
+        <option value='ja'>Japanese</option>
+        <option value='ko'>Korean</option>
+        <option value='pl'>polish</option>
+        <option value='pt'>Portuguese</option>
+        <option value='ru'>Russian</option>
+        <option value='en'>Spanish</option>
+        <option value='tr'>Turkish</option>
+        <option value='vi'>Vietnamese</option>
+
+    </select>
+    <button id="tbutton" onclick = "language()">Translate</button>  
+    <button id="sbutton" type="button" onclick="runSpeechRecognition()">
+        <img src="https://img.icons8.com/ios-glyphs/2x/microphone.png"/>
+    </button> &nbsp; <span id="action"></span>
+
+<div id='flexx'>
+      <div><input id="inputt" oninput="makenull()"/></div>
+   
+    <div id="change"></div>
+     
+</div>
+   
+
+    
+  
+
+</body>
+</html>
+
+<script>
+
+var transcript;
+        /* JS comes here */
+        function runSpeechRecognition() {
+            // get output div reference
+            
+            // get action element reference
+            var action = document.getElementById("action");
+            // new speech recognition object
+            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+            var recognition = new SpeechRecognition();
+        
+            // This runs when the speech recognition service starts
+            recognition.onstart = function() {
+                action.innerHTML = "<small>listening, please speak...</small>";
+            };
+            
+            recognition.onspeechend = function() {
+                action.innerHTML = "<small>stopped listening, hope you are done...</small>";
+                recognition.stop();
+            }
+          
+            // This runs when the speech recognition service returns result
+            recognition.onresult = function(event) {
+                 transcript = event.results[0][0].transcript;
+                var confidence = event.results[0][0].confidence;
+                
+               
+               
+                inputt.value = transcript;
+                console.log(inputt.innerHTML)
+                console.log(transcript);
+
+                language()
+    
+            };
+          
+             // start recognition
+             recognition.start();
+            
+        }
+    
+
+
+async function language(){
+
+    if(transcript == null){
+        var val = document.getElementById('inputt').value;
+    }
+    else{
+        var val = transcript;
+    }
+    
+ 
+    try{
+        
+        let opt = document.getElementById('lan').value;
+
+
+    let res = await fetch("https://libretranslate.de/translate", {
+	method: "POST",
+	body: JSON.stringify({
+		q:val,
+		source: "auto",
+		target: opt,
+		format: "text"
+	}),
+	headers: { "Content-Type": "application/json" }
+});
+
+
+
+let data = await res.json();
+console.log(data.translatedText);
+
+let put = document.getElementById('change');
+put.innerText = data.translatedText;
+
+
+
+    }
+    catch(e){
+        console.log(e);
+    }
+    }
+
+function makenull(){
+    transcript = null;
+}
+
+   
+       
+
+</script>
+
